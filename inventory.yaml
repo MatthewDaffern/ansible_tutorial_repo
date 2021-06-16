@@ -1,0 +1,12 @@
+all:
+  ansible_user: root
+  children:
+    my_inventory:
+      CentOS.matt.lab:
+        ansible_connection: ssh
+      CentOS-2.matt.lab:
+        ansible_connection: ssh
+      CentOS-3.matt.lab:
+        ansible_connection: ssh
+      CentOS-4.matt.lab:
+        ansible_connection: ssh
