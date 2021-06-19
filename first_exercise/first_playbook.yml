@@ -1,0 +1,37 @@
+---
+- name: My First Playbook
+  gather_facts: false
+  hosts: all
+  tasks:
+    - name: copy a file?
+      copy:
+        src: test.txt
+        dest: /etc/test2.txt
+        owner: root
+        group: root
+        mode: '0750'
+    - name: hey Im installing stuff
+      yum:
+        name:
+          - httpd
+        state: present
+    - name: enable the service
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+    - name: firewall
+      shell: firewall-cmd --add-service http --permanent; firewall-cmd --reload
+      args:
+        executable: /bin/bash
+    - name: copy the index file
+      copy:
+        src: /root/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0750'
+    - name: restart the web service
+      systemd:
+        name: httpd
+        state: restarted

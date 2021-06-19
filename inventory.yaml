@@ -1,4 +1,4 @@
-all:
+[all:
   ansible_user: root
   children:
     my_inventory:
@@ -9,4 +9,4 @@ all:
       CentOS-3.matt.lab:
         ansible_connection: ssh
       CentOS-4.matt.lab:
-        ansible_connection: ssh
+        ansible_connection: ssh]

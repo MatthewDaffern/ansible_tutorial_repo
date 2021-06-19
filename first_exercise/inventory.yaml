@@ -1,0 +1,6 @@
+all:
+  hosts:
+    CentOS.matt.lab:
+    CentOS-2.matt.lab:
+    CentOS-3.matt.lab:
+    CentOS-4.matt.lab:
