@@ -15,7 +15,7 @@ do
    fi
 done
 ssh-copy-id root@192.168.8.1;
-ssh root@192.168.8.1 'bash -s' < CentOS-1.sh;
+ssh root@192.168.8.1 'bash -s' < CentOS-1.sh -vv;
 virt-clone --original template --name CentOS-2 --file /home/qemu_daemon/storage/CentOS-2.qcow2;
 virsh start CentOS-2
 CentOS_clone=1
@@ -49,7 +49,7 @@ done
 ssh-copy-id root@192.168.8.1;
 ssh root@192.168.8.1 'bash -s' < CentOS-3.sh;
 virt-clone --original template --name CentOS-4 --file /home/qemu_daemon/storage/CentOS-4.qcow2;
-virsh start CentOS-4CentOS_clone=1
+virsh start CentOS-4
 echo -n "waiting for Template ..."
 while (($CentOS_clone == 1))
 do
