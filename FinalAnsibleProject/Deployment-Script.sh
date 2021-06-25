@@ -1,21 +1,5 @@
 #!/bin/bash
 
-
-CentOS_clone=1
-echo -n "waiting for Template ..."
-while (($CentOS_clone == 1))
-do
-   if ping -c 1 -w 1 192.168.8.1 &> /dev/null
-   then
-      echo "Template is online"
-      CentOS_clone=0
-   else
-      echo -n "waiting... "
-   fi
-done
-
-
-
 virt-clone --original template --name CentOS-1 --file /home/qemu_daemon/storage/CentOS-1.qcow2;
 virsh start CentOS-1
 CentOS_clone=1
