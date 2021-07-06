@@ -9,4 +9,15 @@
       CentOS-3.matt.lab:
         ansible_connection: ssh
       CentOS-4.matt.lab:
-        ansible_connection: ssh]
+        ansible_connection: ssh
+    HA:
+      CentOS.matt.lab:
+        ansible_connection: ssh
+    Web:
+      CentOS-2.matt.lab:
+        ansible_connection: ssh
+      CentOS-3.matt.lab:
+        ansible_connection: ssh
+    DB:
+      CentOS-4.matt.lab:
+        ansible_connection: ssh

@@ -1,0 +1,109 @@
+---
+- name: Install WordPress packages
+  gather_facts: false
+  hosts: CentOS.matt.lab
+  tasks:
+    yum:
+      name:
+      - httpd
+      - php-gd
+      - python2
+      state: present
+
+- name: Install Database
+  gather_facts: false
+  hosts: CentOS-4.matt.lab
+  vars:
+    mysql_root_password: "{{ vault_mysql_password }}"
+  tasks:
+    yum:
+      name:
+      - mariadb-server
+      - python2-PyMySQL
+      - python2
+      - holland-mysqldump
+      state: present
+
+- name: Start the db services
+  gather_facts: false
+  hosts: CentOS-4.matt.lab
+  tasks:
+    systemd:
+      enabled: yes
+      state: started
+      name: mariadb-server
+
+- name: Start the web services
+  hosts: CentOS.matt.lab
+  tasks:
+    systemd:
+      enabled: yes
+      state: started
+      name: httpd
+- name: create the database
+  hosts: CentOS-4.matt.lab
+  tasks:
+    mysql_db:
+      login_user: "{{ vault_mysql_name }}"
+      login_password: "{{ vault_mysql_password }}"
+      login_host: "{{ vault_login_host }}"
+      name: wordpress
+      state: present
+      
+- name: create the db_user
+  hosts: CentOS-4.matt.lab
+  tasks:
+    mysql_user:
+      name: ''
+      host: localhost
+      state: absent
+      login_user: "{{ vault_mysql_name }}"
+      login_password: "{{ vault_mysql_password }}"
+      login_host: "{{ vault_login_host }}"
+    mysql_user:
+      login_user: "{{ vault_mysql_name }}"
+      login_password: "{{ vault_mysql_password }}"
+      login_host: "{{ vault_login_host }}"
+      name: "{{ vault_login_name }}"
+      password: "{{ vault_login_password }}"
+      priv: '*.*:ALL'
+      state: present
+  - name: install php common to the Wordpress Server
+    hosts: CentOS.matt.lab
+    tasks:
+      yum:
+        name:
+           - php-common
+        state: present
+  - name: install php extensions to the Wordpress Server
+    hosts: CentOS.matt.lab
+    tasks:
+      yum:
+        name:
+           - php-curl
+           - php-gd
+           - php-mbstring
+           - php-xml
+           - php-xmlrpc
+           - php-soap
+           - php-intl
+           - php-zip
+        state: present
+      copy:
+        src: /root/wordpress/
+        dest: /var/www/html/
+        owner: apache
+        group: root
+        mode: '570'
+  - name: create the config
+    hosts: CentOS.matt.lab
+    tasks:
+      copy:
+        copy:
+        src: /root/wordpress/wp-config.php
+        dest: /var/www/html/wp-config.php
+        owner: apache
+        group: root
+        mode: '770'
+        follow: yes
+        

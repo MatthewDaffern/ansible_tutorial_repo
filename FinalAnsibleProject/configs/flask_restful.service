@@ -1,0 +1,9 @@
+[Unit]
+Description=Flask_Restful_service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/Python3 /usr/bin/Restful.py
+
+[Install]
+WantedBy=multi-user.target
