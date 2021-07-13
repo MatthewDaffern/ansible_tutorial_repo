@@ -25,7 +25,7 @@ def test_query(cursor_object, query):
 
 
 def touch_database():
-    return test_query(create_db_connection(), 'SELECT * FROM TEST_TABLE')
+    return test_query(create_db_connection(), 'SELECT * FROM FavoriteCars')
 
 
 class TouchDb(Resource):

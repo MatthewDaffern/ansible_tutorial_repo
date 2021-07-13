@@ -152,6 +152,7 @@
         - flask
         - flask-restful
         - pyodbc
+        - PyMySQL
     copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*.py
         dest: /var/FlaskRestful/
@@ -179,3 +180,12 @@
       port: 80/tcp
       permanent: yes
       state: enabled
+- name: configure the database tables:
+  hosts: DB
+  tasks:
+    copy:
+      src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/create_table.sql
+      dest: /var/FlaskRestful/
+      owner: 'flask'
+      mode: '700'
+    shell: mysql -u {{ vault_login_username }} -p {{ vault_login_host }} -h  {{ vault_login_host }} < /var/FlaskRestful.sql
