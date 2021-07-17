@@ -1,0 +1,47 @@
+---
+- name: Install WordPress packages
+  gather_facts: false
+  hosts: CentOS.matt.lab
+  tasks:
+    yum:
+      name:
+      - httpd
+      - php-gd
+      - python2
+      state: present
+
+- name: Install Database
+  gather_facts: false
+  hosts: CentOS-4.matt.lab
+  vars:
+    mysql_root_password: "Thisismysqlpassword1!"
+  tasks:
+    yum:
+      name:
+      - mariadb-server
+      - python2-PyMySQL
+      - python2
+      - holland-mysqldump
+      state: present
+
+- name: Start the db services
+  gather_facts: false
+  hosts: CentOS-4.matt.lab
+  tasks:
+    systemd:
+      enabled: yes
+      state: started
+      name: mariadb-server
+
+- name: Start the web services
+  hosts: CentOS.matt.lab
+  tasks:
+    systemd:
+      enabled: yes
+      state: started
+      name: httpd
+
+- name: create the db_user
+  hosts: CentOS-4.matt.lab
+  tasks:
+   
