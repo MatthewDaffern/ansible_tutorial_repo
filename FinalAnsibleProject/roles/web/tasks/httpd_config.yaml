@@ -1,0 +1,25 @@
+# roles/example/tasks/web.yml
+- name: configure the web servers
+  gather_facts: false
+  tasks:
+    - name: prep the firewall
+      ansible.posix.firewalld:
+        port: 443/tcp
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+    - name: add group
+      group:
+        name: web
+        comment: service group for apache
+        state: present
+    - name: add users
+      user:
+        name: apache
+        comment: service account for apache
+        group: web
+        state: present
+    - name: install apache
+      yum:
+        name: httpd
+        state: present    
