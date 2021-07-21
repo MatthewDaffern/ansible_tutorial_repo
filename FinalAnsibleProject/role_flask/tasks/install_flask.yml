@@ -8,7 +8,9 @@
         - pyodbc
         - PyMySQL
     ansible.posix.firewalld:
-      port: 443/tcp
-      port: 80/tcp
+      port: "{{ item }}"
+      loop:
+        - 80/tcp
+        - 443/tcp
       permanent: yes
       state: enabled

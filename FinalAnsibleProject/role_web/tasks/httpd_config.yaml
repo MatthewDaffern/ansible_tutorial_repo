@@ -4,8 +4,10 @@
   tasks:
     - name: prep the firewall
       ansible.posix.firewalld:
-        port: 443/tcp
-        port: 80/tcp
+        port: "{{ item }}"
+        loop:
+          - 443/tcp
+          - 80/tcp
         permanent: yes
         state: enabled
     - name: add group
