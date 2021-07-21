@@ -64,38 +64,37 @@
   gather_facts: false
   hosts: DB
   tasks:
-    systemd:
-      enabled: yes
-      state: started
-      name: mariadb-server
+    - systemd:
+        enabled: yes
+        state: started
+        name: mariadb-server
 - name: create the database
   hosts: DB
   tasks:
-    mysql_db:
-      login_user: "{{ vault_mysql_name }}"
-      login_password: "{{ vault_mysql_password }}"
-      login_host: "{{ vault_login_host }}"
-      name: wordpress
-      state: present
-      
+    - mysql_db:
+        login_user: "{{ vault_mysql_name }}"
+        login_password: "{{ vault_mysql_password }}"
+        login_host: "{{ vault_login_host }}"
+        name: wordpress
+        state: present
 - name: create the db_user
   hosts: DB
   tasks:
-    mysql_user:
-      name: ''
-      host: localhost
-      state: absent
-      login_user: "{{ vault_mysql_name }}"
-      login_password: "{{ vault_mysql_password }}"
-      login_host: "{{ vault_login_host }}"
-    mysql_user:
-      login_user: "{{ vault_mysql_name }}"
-      login_password: "{{ vault_mysql_password }}"
-      login_host: "{{ vault_login_host }}"
-      name: "{{ vault_login_name }}"
-      password: "{{ vault_login_password }}"
-      priv: '*.*:ALL'
-      state: present
+    - mysql_user:
+        name: ''
+        host: localhost
+        state: absent
+        login_user: "{{ vault_mysql_name }}"
+        login_password: "{{ vault_mysql_password }}"
+        login_host: "{{ vault_login_host }}"
+    - mysql_user:
+        login_user: "{{ vault_mysql_name }}"
+        login_password: "{{ vault_mysql_password }}"
+        login_host: "{{ vault_login_host }}"
+        name: "{{ vault_login_name }}"
+        password: "{{ vault_login_password }}"
+        priv: '*.*:ALL'
+        state: present
 - name: add the flask user
   hosts: DB
   tasks:
@@ -104,9 +103,9 @@
 - name: install the flask restful module
   hosts: DB
   tasks:
-    import_role:
+    - import_role:
         name: /roles/flask
-    copy:
+    - copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*.py
         dest: /var/FlaskRestful/
         owner: flask
@@ -114,26 +113,27 @@
 - name: set the username and password as env vars
   hosts: DB
   tasks:
-    shell: db_username={{ vault_mysql_username }}
-    shell: db_password={{ vault_mysql_password }}
+    - shell: db_username={{ vault_mysql_username }}
+    - shell: db_password={{ vault_mysql_password }}
 - name: export the variables I need
   hosts: DB
   tasks:
-    shell: export db_username; export db_password
+    - shell: export db_username; export db_password
 - name: configure the restful_service
   hosts: DB
   tasks:
-    copy:
-      src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/flask_restful.service
-      dest: /etc/systemd/system/flask_restful.service
-      mode: '550'
-    shell: enable flask_restful.service; start flask_restful.service
+    - copy:
+        src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/flask_restful.service
+        dest: /etc/systemd/system/flask_restful.service
+        mode: '550'
+    - shell: enable flask_restful.service; start flask_restful.service
 - name: configure the database tables:
   hosts: DB
   tasks:
-    copy:
-      src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/create_table.sql
-      dest: /var/FlaskRestful/
-      owner: 'flask'
-      mode: '550'
-    shell: mysql -u {{ vault_login_username }} -p {{ vault_login_host }} -h  {{ vault_login_host }} < /var/FlaskRestful.sql
+    - copy:
+        src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/create_table.sql
+        dest: /var/FlaskRestful/
+        owner: 'flask'
+        mode: '550'
+    - shell: mysql -u {{ vault_login_username }} -p {{ vault_login_host }} -h  {{ vault_login_host }} < /var/FlaskRestful.sql
+    
