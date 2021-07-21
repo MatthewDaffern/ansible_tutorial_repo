@@ -20,7 +20,7 @@
   hosts: web
   tasks:
     - import_role: 
-        name: /roles/web
+        name: role_web
     - name: copy the index files over
       copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*
@@ -39,7 +39,7 @@
   hosts: HA
   tasks:
     - import_role: 
-        name: /roles/HAProxy
+        name: role_HAProxy
     - copy: 
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/configs/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
@@ -59,7 +59,7 @@
     mysql_root_password: "{{ vault_mysql_password }}"
   tasks:
     - import_role: 
-        name: /roles/web
+        name: role_web
 - name: Start the db services
   gather_facts: false
   hosts: DB
@@ -104,7 +104,7 @@
   hosts: DB
   tasks:
     - import_role:
-        name: /roles/flask
+        name: role_flask
     - copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*.py
         dest: /var/FlaskRestful/
