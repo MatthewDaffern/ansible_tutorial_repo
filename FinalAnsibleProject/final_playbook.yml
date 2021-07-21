@@ -95,14 +95,11 @@
         password: "{{ vault_login_password }}"
         priv: '*.*:ALL'
         state: present
-- name: add the flask user
-  hosts: DB
-  tasks:
-    user:
-      name: flask
 - name: install the flask restful module
   hosts: DB
   tasks:
+    - user:
+        name: flask
     - import_role:
         name: role_flask
     - copy:
