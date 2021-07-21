@@ -5,7 +5,7 @@
   tasks:
     - name: upgrade all packages
       yum:
-        name: *
+        name: "*"
         state: latest
     - name: adding authorized key
       ansible.posix.authorized_key:
@@ -19,10 +19,11 @@
   gather_facts: false
   hosts: web
   tasks:
-    - name: configure the web server
-      import_role: /roles/web
+    - import_role: 
+        name: /roles/web
     - name: copy the index files over
-      src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*
+      copy:
+        src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*
         dest: /var/www/html/*
         owner: apache
         group: web
@@ -37,8 +38,8 @@
   gather_facts: false
   hosts: HA
   tasks:
-    - name: configure the web server
-      import_role: /roles/HAProxy
+    - import_role: 
+        name: /roles/HAProxy
     - copy: 
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/configs/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
@@ -57,8 +58,8 @@
   vars:
     mysql_root_password: "{{ vault_mysql_password }}"
   tasks:
-    - name: configure the web server
-        import_role: /roles/web
+    - import_role: 
+        name: /roles/web
 - name: Start the db services
   gather_facts: false
   hosts: DB
@@ -103,9 +104,8 @@
 - name: install the flask restful module
   hosts: DB
   tasks:
-    name: install flask
-      import_role:
-        name: flask
+    import_role:
+        name: /roles/flask
     copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*.py
         dest: /var/FlaskRestful/
