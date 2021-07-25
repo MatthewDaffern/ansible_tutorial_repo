@@ -1,5 +1,5 @@
-# roles/example/tasks/HAProxy.yml
-- name: configure HAProxy
+# roles/example/tasks/install_flask.yml
+- name: configure the server for flask
   gather_facts: false
   tasks:
     - name: prep the firewall
@@ -8,21 +8,13 @@
         permanent: true
         state: enabled
       loop:
-        - 8181/tcp
         - 443/tcp
         - 80/tcp
-    - name: add group
-      group:
-        name: HA
-        comment: service group for HAProxy
-        state: present
-    - name: add users
-      user:
-        name: haproxy
-        comment: service account for apache
-        group: HA
-        state: present
-    - name: install HAProxy
-      yum:
-        name: haproxy
+    - name: install the neccesary modules
+      pip:
+        name: 
+          - pyodbc
+          - flask
+          - MyPySQL
+          - flask-restful
         state: present

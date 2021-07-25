@@ -84,7 +84,7 @@
   hosts: DB
   tasks:
     - name: remove any anonymous user
-        mysql_user:
+      mysql_user:
         name: ''
         host: localhost
         state: absent
