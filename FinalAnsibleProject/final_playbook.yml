@@ -1,12 +1,8 @@
 ---
-- name: upgrade the infrastructure 
+- name: configuring my keys
   gather_facts: false
   hosts: all
   tasks:
-    - name: upgrade all packages
-      yum:
-        name: "*"
-        state: latest
     - name: adding authorized key
       ansible.posix.authorized_key:
         user: root
@@ -19,7 +15,8 @@
   gather_facts: false
   hosts: web
   tasks:
-    - import_role: 
+    - name: configure web role
+      import_role:
         name: role_web
     - name: copy the index files over
       copy:
@@ -28,29 +25,31 @@
         owner: apache
         group: web
         mode: '550'
-        follow: yes
+        follow: true
     - name: start the apache web services
       systemd:
         name: httpd
-        enabled: yes
+        enabled: true
         state: started
 - name: configure HAProxy
   gather_facts: false
   hosts: HA
   tasks:
-    - import_role: 
+    - name: configure HA role
+      import_role:
         name: role_HAProxy
-    - copy: 
+    - name: copy HA config
+      copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/configs/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
         owner: haproxy
         group: root
         mode: '550'
-        follow: yes
+        follow: true
     - name: add systemd unit for haproxy
       systemd:
         name: haproxy
-        enabled: yes
+        enabled: true
         state: started
 - name: configure the DB Server
   gather_facts: false
@@ -58,20 +57,24 @@
   vars:
     mysql_root_password: "{{ vault_mysql_password }}"
   tasks:
-    - import_role: 
-        name: role_web
+    - name: install mysql
+      yum:
+        name: mysql
+        state: present
 - name: Start the db services
   gather_facts: false
   hosts: DB
   tasks:
-    - systemd:
-        enabled: yes
+    - name: start the db server
+      systemd:
+        enabled: true
         state: started
         name: mariadb-server
 - name: create the database
   hosts: DB
   tasks:
-    - mysql_db:
+    - name: create the database
+      mysql_db:
         login_user: "{{ vault_mysql_name }}"
         login_password: "{{ vault_mysql_password }}"
         login_host: "{{ vault_login_host }}"
@@ -80,14 +83,16 @@
 - name: create the db_user
   hosts: DB
   tasks:
-    - mysql_user:
+    - name: remove any anonymous user
+        mysql_user:
         name: ''
         host: localhost
         state: absent
         login_user: "{{ vault_mysql_name }}"
         login_password: "{{ vault_mysql_password }}"
         login_host: "{{ vault_login_host }}"
-    - mysql_user:
+    - name: add my user
+      mysql_user:
         login_user: "{{ vault_mysql_name }}"
         login_password: "{{ vault_mysql_password }}"
         login_host: "{{ vault_login_host }}"
@@ -98,11 +103,14 @@
 - name: install the flask restful module
   hosts: DB
   tasks:
-    - user:
+    - name: add the flask user account
+      user:
         name: flask
-    - import_role:
+    - name: configure the flask role
+      import_role:
         name: role_flask
-    - copy:
+    - name: copy the flask files
+      copy:
         src: '/root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/web_files/*.py'
         dest: '/var/FlaskRestful/'
         owner: flask
@@ -110,26 +118,33 @@
 - name: set the username and password as env vars
   hosts: DB
   tasks:
-    - shell: db_username={{ vault_mysql_username }}
-    - shell: db_password={{ vault_mysql_password }}
+    - name: set the username
+      shell: db_username={{ vault_mysql_username }}
+    - name: set the password
+      shell: db_password={{ vault_mysql_password }}
 - name: export the variables I need
   hosts: DB
   tasks:
-    - shell: export db_username; export db_password
+    - name: set the vars to be persistent
+      shell: export db_username; export db_password
 - name: configure the restful_service
   hosts: DB
   tasks:
-    - copy:
+    - name: copy the systemd unit file
+      copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/flask_restful.service
         dest: /etc/systemd/system/flask_restful.service
         mode: '550'
-    - shell: enable flask_restful.service; start flask_restful.service
+    - name: enable the systemd unit file
+      shell: enable flask_restful.service; start flask_restful.service
 - name: configure the database tables
   hosts: DB
   tasks:
-    - copy:
+    - name: copy the sql script
+      copy:
         src: /root/GitHub/ansible_tutorial_repo/FinalAnsibleProject/config/create_table.sql
         dest: /var/FlaskRestful/
         owner: 'flask'
         mode: '550'
-    - shell: mysql -u {{ vault_login_username }} -p {{ vault_login_host }} -h  {{ vault_login_host }} < /var/FlaskRestful.sql
+    - name: execute the script
+      shell: mysql -u {{ vault_login_username }} -p {{ vault_login_host }} -h  {{ vault_login_host }} < /var/FlaskRestful.sql
