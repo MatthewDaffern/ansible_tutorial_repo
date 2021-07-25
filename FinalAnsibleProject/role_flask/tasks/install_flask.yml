@@ -1,16 +1,12 @@
+---
 # roles/example/tasks/install_flask.yml
 - name: install the flask restful modules
   tasks:
-    pip:
-      name: 
-        - flask
-        - flask-restful
-        - pyodbc
-        - PyMySQL
-    ansible.posix.firewalld:
-      port: "{{ item }}"
-      loop:
-        - 80/tcp
-        - 443/tcp
-      permanent: yes
-      state: enabled
+    pip: 
+      name: flask flask-restful pyodbc PyMySQL
+- name: set the firewall
+  tasks:
+    - ansible.posix.firewalld:
+        port: 80/tcp
+        state: enabled
+        permanent: true
