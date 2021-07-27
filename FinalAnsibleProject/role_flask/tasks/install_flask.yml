@@ -1,20 +1,20 @@
 # roles/example/tasks/install_flask.yml
-- name: configure the server for flask
-  gather_facts: false
-  tasks:
-    - name: prep the firewall
-      ansible.posix.firewalld:
-        port: "{{ item }}"
-        permanent: true
-        state: enabled
-      loop:
-        - 443/tcp
-        - 80/tcp
-    - name: install the neccesary modules
-      pip:
-        name: 
-          - pyodbc
-          - flask
-          - MyPySQL
-          - flask-restful
-        state: present
+- name: prep the firewall
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+  loop:
+    - 443/tcp
+    - 80/tcp
+- name: install the neccesary modules
+  pip:
+    name:
+      - pyodbc
+      - flask
+      - MyPySQL
+      - flask-restful
+    state: present
+- name: add the flask user account
+  user:
+    name: flask
