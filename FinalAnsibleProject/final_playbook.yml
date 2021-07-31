@@ -103,9 +103,6 @@
 - name: install the flask restful module
   hosts: DB
   tasks:
-    - name: add the flask user account
-      user:
-        name: flask
     - name: configure the flask role
       import_role:
         name: role_flask

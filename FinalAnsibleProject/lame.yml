@@ -1,28 +1,52 @@
-all:
-  hosts:
-    mail.example.com:
-  children:
-    webservers:
-      hosts:
-        foo.example.com:
-        bar.example.com:
-    dbservers:
-      hosts:
-        one.example.com:
-        two.example.com:
-        three.example.com:
-    east:
-      hosts:
-        foo.example.com:
-        one.example.com:
-        two.example.com:
-    west:
-      hosts:
-        bar.example.com:
-        three.example.com:
-    prod:
-      children:
-        east:
-    test:
-      children:
-        west:
+---
+groups:
+  app1-prod:
+    include:
+      - app1
+    require:
+      - prod
+
+  app1-dev:
+    include:
+      - app1
+    require:
+      - prod
+
+  app2-prod:
+    hosts:
+      - app2-web1
+
+  app2:
+    include:
+      - app2-prod
+      - app2-dev
+
+  all-apps:
+    include:
+      - app1
+      - app2
+
+hosts:
+  web-app1-prod.location1.com:
+    groups:
+      - app1
+      - location1
+      - prod
+      - web
+
+  db-app1-prod.location1.com:
+    groups:
+      - app1
+      - location1
+      - prod
+      - db
+
+  app1-dev.location1.com:
+    vars:
+      EXAMPLE: "true"
+    groups:
+      - app1
+      - location2
+      - dev
+      - web
+      - db

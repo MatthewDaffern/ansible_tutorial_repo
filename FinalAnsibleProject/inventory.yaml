@@ -1,5 +1,5 @@
-[all:
-  ansible_user: root
+---
+all:
   children:
     my_inventory:
       CentOS.matt.lab:
